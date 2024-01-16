@@ -1,0 +1,38 @@
+{% extends 'sender/base.html' %}
+{% block content %}
+
+<div class="album py-4 bg-body-tertiary text-center">
+    <h1>Sender - our clients</h1>
+    <div class="container">
+        <div class="row">
+            <p class="d-inline-flex gap-1"></p>
+            <p class="d-inline-flex gap-1">
+                <a href="{% url 'client:client_create' %}" type="button"
+                   class="btn btn-outline-light">+ Add client</a>
+            </p>
+
+            {% for object in object_list %}
+            <div class="col-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p>{{ object.fio | title }}</p>
+                        <p>{{ object.email }}</p>
+                        {% if object.comment != None %}
+                        <p class="text-center">{{ object.comment }}</p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="{% url 'client:client_view' object.pk %}" type="button"
+                                   class="btn btn-outline-light">View</a>
+                                <a href="{% url 'client:client_update' object.pk %}" type="button"
+                                   class="btn btn-outline-light">Edit</a>
+                                <a href="{% url 'client:client_delete' object.pk %}" type="button"
+                                   class="btn btn-outline-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endblock %}

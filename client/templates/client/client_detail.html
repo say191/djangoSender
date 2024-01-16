@@ -1,0 +1,22 @@
+{% extends 'sender/base.html' %}
+{% block content %}
+
+<div class="col-5">
+    <a href="{% url 'client:client_list' %}" type="button"
+       class="btn btn-outline-light">Back to list</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>{{ object.fio | title }}</p>
+            <p>{{ object.email}}</p>
+            <p>{{ object.comment}}</p>
+            <div class="btn-group">
+                <a href="{% url 'client:client_update' object.pk %}" type="button"
+                   class="btn btn-outline-light">Edit</a>
+                <a href="{% url 'client:client_delete' object.pk %}" type="button"
+                   class="btn btn-outline-danger">Delete</a>
+            </div>
+            <p></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

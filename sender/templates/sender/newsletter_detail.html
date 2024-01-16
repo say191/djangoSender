@@ -1,0 +1,29 @@
+{% extends 'sender/base.html' %}
+{% block content %}
+
+<div class="col-5">
+    <a href="{% url 'sender:newsletter_list' %}" type="button"
+       class="btn btn-outline-light">Back to list</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>{{ object.theme_message | title }}</p>
+            <p>{{ object.text_message | truncatechars:100}}</p>
+            <div class="btn-group">
+                <a href="{% url 'sender:newsletter_update' object.pk %}" type="button"
+                   class="btn btn-outline-light">Edit</a>
+                <a href="{% url 'sender:newsletter_delete' object.pk %}" type="button"
+                   class="btn btn-outline-danger">Delete</a>
+            </div>
+            <p></p>
+            <p>Time send: {{ object.time_send }}</p>
+            <p>Time stop: {{ object.time_stop }}</p>
+            <p>Periodicity: {{ object.periodicity }}</p>
+            <p>Status: {{ object.status }}</p>
+            <p>List of clients:</p>
+            {% for i in object.clients.all %}
+            <p>{{ i }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
