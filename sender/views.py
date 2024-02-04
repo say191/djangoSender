@@ -2,6 +2,7 @@ from sender.models import Newsletter
 from django.views.generic import ListView, CreateView, DetailView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from sender.apps import SenderConfig
+from sender.forms import NewsletterForm
 
 
 app_name = SenderConfig.name
@@ -17,7 +18,7 @@ class NewsletterDetailView(DetailView):
 
 class NewsletterCreate(CreateView):
     model = Newsletter
-    fields = ('theme_message', 'text_message', 'time_send', 'time_stop', 'periodicity', 'status', 'clients')
+    form_class = NewsletterForm
     success_url = reverse_lazy('sender:newsletter_list')
 
 
@@ -28,5 +29,5 @@ class NewsletterDeleteView(DeleteView):
 
 class NewsletterUpdateView(UpdateView):
     model = Newsletter
-    fields = ('theme_message', 'text_message', 'time_send', 'time_stop', 'periodicity', 'status', 'clients')
+    form_class = NewsletterForm
     success_url = reverse_lazy('sender:newsletter_list')

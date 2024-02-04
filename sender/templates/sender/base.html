@@ -26,6 +26,13 @@
                         <li><a href="{% url 'sender:newsletter_list' %}" class="text-white">Newsletters</a></li>
                         <li><a href="{% url 'log:log_list' %}" class="text-white">Logs</a></li>
                         <li><a href="{% url 'client:client_list' %}" class="text-white">Clients</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'users:profile' %}" class="text-white">Profile</a></li>
+                        <li><a href="{% url 'users:logout' %}" class="text-white">Logout</a></li>
+                        {% else %}
+                        <li><a href="{% url 'users:login' %}" class="text-white">Login</a></li>
+                        <li><a href="{% url 'users:register' %}" class="text-white">Register</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

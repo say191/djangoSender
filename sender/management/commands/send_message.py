@@ -13,6 +13,10 @@ from sender.services import send_newsletter
 logger = logging.getLogger(__name__)
 
 
+# Настройки для работы библиотеки django-apscheduler, которая позволяет выполнять задания
+# с определенной переодичностью
+
+
 @util.close_old_connections
 def delete_old_job_executions(max_age=604_800):
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
