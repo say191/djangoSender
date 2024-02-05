@@ -3,3 +3,5 @@ ipython
 pillow
 psycopg2
 django-apscheduler
+redis
+python-dotenv

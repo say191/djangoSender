@@ -1,0 +1,40 @@
+{% extends 'sender/base.html' %}
+{% block content %}
+
+<div class="album py-4 bg-body-tertiary text-center">
+    <h1>Sender - our users</h1>
+    <div class="container">
+        <div class="row">
+            {% for object in object_list %}
+            <div class="col-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if object.FIO %}
+                        <p>FIO: {{ object.FIO }}</p>
+                        {% else %}
+                        <p>FIO: not indicated</p>
+                        {% endif %}
+                        <p>{{ object.email}}</p>
+                        {% if object.phone %}
+                        <p>Phone: {{ object.phone}}</p>
+                        {% else %}
+                        <p>Phone: not indicated</p>
+                        {% endif %}
+                        <p>Active status: {{ object.is_active}}</p>
+                        {% if object.is_active %}
+                        <div class="btn-group">
+                            <a href="{% url 'users:block_user' object.pk %}" type="button"
+                               class="btn btn-outline-danger">Block</a>
+                        </div>
+                        {% else %}
+                        <div class="btn-group">
+                            <a href="{% url 'users:activate_user' object.pk %}" type="button"
+                               class="btn btn-outline-success">Activate</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endblock %}

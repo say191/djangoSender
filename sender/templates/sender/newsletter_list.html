@@ -5,33 +5,49 @@
     <h1>Sender - our newsletters</h1>
     <div class="container">
         <div class="row">
+            {% if perms.sender.add_newsletter %}
             <p class="d-inline-flex gap-1">
                 <a href="{% url 'sender:newsletter_create' %}" type="button"
                    class="btn btn-outline-light">+ Add newsletter</a>
             </p>
-
+            {% endif %}
             {% for object in object_list %}
+            {% if user.is_staff or user.is_superuser or object.owner == user %}
             <div class="col-3">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <p>{{ object.theme_message | title }}</p>
                         <p>{{ object.text_message | truncatechars:100}}</p>
-                            <div class="btn-group">
-                                <a href="{% url 'sender:newsletter_view' object.pk %}" type="button"
-                                   class="btn btn-outline-light">View</a>
-                                <a href="{% url 'sender:newsletter_update' object.pk %}" type="button"
-                                   class="btn btn-outline-light">Edit</a>
-                                <a href="{% url 'sender:newsletter_delete' object.pk %}" type="button"
-                                   class="btn btn-outline-danger">Delete</a>
-                            </div>
+                        <div class="btn-group">
+                            <a href="{% url 'sender:newsletter_view' object.pk %}" type="button"
+                               class="btn btn-outline-light">View</a>
+                            {% if user.is_superuser or object.owner == user %}
+                            <a href="{% url 'sender:newsletter_update' object.pk %}" type="button"
+                               class="btn btn-outline-light">Edit</a>
+                            <a href="{% url 'sender:newsletter_delete' object.pk %}" type="button"
+                               class="btn btn-outline-danger">Delete</a>
+                            {% endif %}
+                        </div>
                         <p></p>
-                        <p>Time send: {{ object.time_send }}</p>
-                        <p>Time stop: {{ object.time_stop }}</p>
+                        <p>Start: {{ object.start_date }}</p>
+                        <p>Stop: {{ object.stop_date }}</p>
                         <p>Periodicity: {{ object.periodicity }}</p>
                         <p>Status: {{ object.status }}</p>
+                        <p>Status: {{ object.is_active }}</p>
+                        {% if user.is_staff or user.is_superuser %}
+                        <p>Owner: {{ object.owner }}</p>
+                        {% if object.is_active %}
+                        <a href="{% url 'sender:deactivate_newsletter' object.pk %}" type="button"
+                           class="btn btn-outline-danger">Deactivate newsletter</a>
+                        {% else %}
+                        <a href="{% url 'sender:activate_newsletter' object.pk %}" type="button"
+                           class="btn btn-outline-success">Activate newsletter</a>
+                        {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endblock %}

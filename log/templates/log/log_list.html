@@ -6,6 +6,7 @@
     <div class="container">
         <div class="row">
             {% for object in object_list %}
+            {% if object.owner == request.user or request.user.is_superuser %}
             <div class="col-3">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -20,6 +21,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endblock %}

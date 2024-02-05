@@ -1,15 +1,19 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
-from django.views.generic import CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import CreateView, UpdateView, ListView
 from users.models import User
 from users.forms import UserForm, UserVerifyForm, UserProfileForm, UserChangePassForm, UserForgotPassForm
 from django.urls import reverse_lazy, reverse
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import os
 import random
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import Permission
+from django.conf import settings
 
 
 class LoginView(BaseLoginView):
@@ -35,8 +39,8 @@ class RegisterView(CreateView):
         message.attach(MIMEText(f"Your verify token:\n{new_user.verify_token}", 'plain'))
         connection = smtplib.SMTP('smtp.gmail.com')
         connection.starttls()
-        connection.login(user=os.getenv('EMAIL_HOST'), password=os.getenv('PASSWORD_HOST'))
-        connection.sendmail(from_addr=os.getenv('EMAIL_HOST'), to_addrs=new_user.email, msg=message.as_string())
+        connection.login(user=settings.EMAIL_HOST, password=settings.PASSWORD_HOST)
+        connection.sendmail(from_addr=settings.EMAIL_HOST, to_addrs=new_user.email, msg=message.as_string())
         connection.close()
         return super().form_valid(form)
 
@@ -49,6 +53,10 @@ def verify(request):
             try:
                 user = User.objects.get(verify_token=token)
                 user.is_active = True
+                permission_add_newsletter = Permission.objects.get(codename="add_newsletter")
+                user.user_permissions.add(permission_add_newsletter)
+                permission_add_client = Permission.objects.get(codename="add_client")
+                user.user_permissions.add(permission_add_client)
                 user.save()
                 return render(request, 'users/register_success.html')
             except User.DoesNotExist:
@@ -58,7 +66,7 @@ def verify(request):
     return render(request, 'users/verify.html', {'form': form})
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
     template_name = 'users/profile.html'
@@ -68,6 +76,7 @@ class UserUpdateView(UpdateView):
         return self.request.user
 
 
+@login_required
 def change_password(request):
     if request.POST:
         form = UserChangePassForm(request.POST)
@@ -96,8 +105,8 @@ def forgot_password(request):
                 message.attach(MIMEText(f"Your password:\n{new_password}", 'plain'))
                 connection = smtplib.SMTP('smtp.gmail.com')
                 connection.starttls()
-                connection.login(user=os.getenv('EMAIL_HOST'), password=os.getenv('PASSWORD_HOST'))
-                connection.sendmail(from_addr=os.getenv('EMAIL_HOST'), to_addrs=user.email, msg=message.as_string())
+                connection.login(user=settings.EMAIL_HOST, password=settings.PASSWORD_HOST)
+                connection.sendmail(from_addr=settings.EMAIL_HOST, to_addrs=user.email, msg=message.as_string())
                 connection.close()
                 return redirect(reverse('users:login'))
             except User.DoesNotExist:
@@ -105,3 +114,22 @@ def forgot_password(request):
     else:
         form = UserForgotPassForm()
         return render(request, 'users/forgot_password.html', {'form': form})
+
+
+class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = User
+    permission_required = 'users.view_user'
+
+
+def block_user(request, pk):
+    user = User.objects.get(pk=pk)
+    user.is_active = False
+    user.save()
+    return redirect(reverse('users:user_list'))
+
+
+def activate_user(request, pk):
+    user = User.objects.get(pk=pk)
+    user.is_active = True
+    user.save()
+    return redirect(reverse('users:user_list'))

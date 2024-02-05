@@ -5,13 +5,15 @@
     <h1>Sender - our clients</h1>
     <div class="container">
         <div class="row">
+            {% if perms.client.add_client %}
             <p class="d-inline-flex gap-1"></p>
             <p class="d-inline-flex gap-1">
                 <a href="{% url 'client:client_create' %}" type="button"
                    class="btn btn-outline-light">+ Add client</a>
             </p>
-
+            {% endif %}
             {% for object in object_list %}
+            {% if object.owner == request.user or request.user.is_superuser %}
             <div class="col-3">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -33,6 +35,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endblock %}
