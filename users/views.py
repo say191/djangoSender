@@ -123,13 +123,15 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 def block_user(request, pk):
     user = User.objects.get(pk=pk)
-    user.is_active = False
-    user.save()
+    if not user.is_superuser and not user.is_staff:
+        user.is_active = False
+        user.save()
     return redirect(reverse('users:user_list'))
 
 
 def activate_user(request, pk):
     user = User.objects.get(pk=pk)
-    user.is_active = True
-    user.save()
+    if not user.is_superuser and not user.is_staff:
+        user.is_active = True
+        user.save()
     return redirect(reverse('users:user_list'))
